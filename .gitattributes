@@ -1,0 +1,6 @@
+# macOS : un CRLF casse le shebang, LF obligatoire
+*.command text eol=lf
+*.sh      text eol=lf
+
+# Windows : les .cmd doivent rester en CRLF
+*.cmd     text eol=crlf

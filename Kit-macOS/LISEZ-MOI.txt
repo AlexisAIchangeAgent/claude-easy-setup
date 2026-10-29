@@ -1,0 +1,39 @@
+KIT macOS 
+=======================================================
+
+DEZIPPEZ CE DOSSIER AVANT TOUTE CHOSE.
+
+PREMIER LANCEMENT : macOS bloque les fichiers .command telecharges.
+  - macOS 14 (Sonoma)  : clic DROIT sur le fichier -> Ouvrir -> Ouvrir
+  - macOS 15 et plus   : double-clic (il refuse), puis
+                         Reglages Systeme -> Confidentialite et securite
+                         -> "Ouvrir quand meme"
+C'est normal. Ce n'est pas un signe que quelque chose ne va pas.
+
+Puis, dans cet ordre :
+
+  1. setup-claude-workstation.command
+     Installe Homebrew, Node 24, Python, Git, Chrome, Obsidian, Claude.
+     Votre mot de passe sera demande : c'est Homebrew qui l'exige.
+
+  2. Installer l'extension Claude pour Chrome, puis activer
+     "Autoriser l'acces aux URL de fichier" dans ses parametres.
+     Ce reglage echoue en silence : voir le guide, section 3.
+
+  3. FERMER le Terminal, en rouvrir un neuf.
+     (les changements de PATH ne s'appliquent pas aux fenetres ouvertes)
+
+  4. diagnostic-poste.command
+     Puis RENVOYER la ligne de resultat, ou joindre le fichier rapport
+     qu'il depose dans ce dossier. Meme si le verdict est ROUGE.
+
+Le diagnostic est en lecture seule : il n'installe rien, ne modifie rien,
+ne demande aucun mot de passe.
+
+Si les fichiers refusent de s'ouvrir, passez par le Terminal :
+    cd ~/Downloads/Kit-macOS
+    chmod +x *.command
+    ./diagnostic-poste.command
+
+EXIGENCE A CONNAITRE : l'espace de travail Cowork demande macOS 14
+(Sonoma) au minimum. Les Mac Intel sont supportes, simplement plus lents.

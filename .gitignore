@@ -1,0 +1,9 @@
+# Rapports générés par Diagnostic-poste.ps1 (contiennent le nom d'utilisateur du poste)
+Diagnostic-*.txt
+Kit-Windows/Diagnostic-*.txt
+
+# Fichiers système / éditeur
+Thumbs.db
+Desktop.ini
+.DS_Store
+*.swp

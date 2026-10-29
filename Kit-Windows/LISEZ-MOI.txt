@@ -1,0 +1,36 @@
+KIT WINDOWS 
+=========================================================
+
+DEZIPPEZ CE DOSSIER AVANT TOUTE CHOSE.
+Lance depuis l'interieur du .zip, un script ne voit pas ses voisins.
+
+Puis, dans cet ordre :
+
+  1. Double-cliquer sur   Installer.cmd
+     Installe Node, Python, Git, GitHub CLI, Claude Code.
+     Windows demandera des autorisations : acceptez-les.
+
+  2. Installer a la main, s'ils ne sont pas deja la :
+       - Google Chrome    https://www.google.com/chrome/
+       - Obsidian         https://obsidian.md
+
+  3. Installer Claude Desktop a la main :
+       https://claude.com/download
+     ATTENTION : ne passez PAS par winget. Le paquet winget s'installe
+     sans les droits necessaires et l'espace de travail ne fonctionne pas.
+
+  4. Installer l'extension Claude pour Chrome, puis activer
+     "Autoriser l'acces aux URL de fichier" dans ses parametres.
+     Ce reglage echoue en silence : voir le guide, section 3.
+
+  5. FERMER toutes les fenetres, en rouvrir une neuve.
+
+  6. Double-cliquer sur   Diagnostic.cmd
+     Puis RENVOYER la ligne de resultat, ou joindre le fichier rapport
+     qu'il depose dans ce dossier. Meme si le verdict est ROUGE.
+
+Le diagnostic est en lecture seule : il n'installe rien, ne modifie rien,
+ne demande aucun mot de passe.
+
+Si Windows affiche "Windows a proteje votre ordinateur" :
+  Informations complementaires  ->  Executer quand meme.

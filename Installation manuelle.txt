@@ -1,0 +1,50 @@
+Activation paramètre Windows en mode avancé
+
+Système -> Avancé
+- Explorateur de fichier -> Activé les chemins long
+- Terminal -> PowerShell
+- Espace développeur -> Mode développeur
+
+Redémarrer l'ordinateur
+
+ouvrir cmd sans mode administrateur
+
+# vérifier si l'installeur CLI de Windows est disponible et sa version
+# trouver le chemin de l'outil d'installation Winget si il est absent
+
+winget --version
+where.exe winget
+
+# installer node JS version stable
+# installer GitHub CLI
+
+winget install -e --id OpenJS.NodeJS.LTS
+winget install --id GitHub.cli
+winget install --id Git.Git -e --source winget
+
+# vérifier l'installation de Node JS et GitHub CLI
+node --version
+npm --version
+gh --version
+
+
+# installer claude desktop avec droit admin
+# installer claude code CLI
+
+https://claude.com/download
+irm https://claude.ai/install.ps1 | iex
+
+# PowerShell command to add it to your user PATH permanently:
+ 
+$dir  = Join-Path $env:USERPROFILE ".local\bin"
+$user = [Environment]::GetEnvironmentVariable("Path", "User")
+if ($user -split ';' -notcontains $dir) {
+    [Environment]::SetEnvironmentVariable("Path", ($user.TrimEnd(';') + ";$dir"), "User")
+}
+[Environment]::GetEnvironmentVariable("Path", "User") -split ';'
+
+# After running that, close and reopen your terminal (PATH changes don't apply to already-open windows), then run:
+
+
+# verifier l'installation de claude code CLI
+claude --version
