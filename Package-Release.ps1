@@ -28,6 +28,9 @@
 .PARAMETER OutDir
     Dossier de sortie. Par defaut : dist\ a la racine du depot.
 
+.PARAMETER Help
+    Affiche l'aide et quitte. Accepte aussi --help, -h, /? et ?.
+
 .EXAMPLE
     .\Package-Release.ps1 1.0.0
 
@@ -37,14 +40,65 @@
 
 [CmdletBinding()]
 param(
-    [Parameter(Mandatory, Position = 0)]
+    [Parameter(Position = 0)]
     [string]$Version,
 
-    [string]$OutDir
+    [string]$OutDir,
+
+    [switch]$Help,
+
+    # Recupere les jetons non reconnus par le parseur (--help notamment).
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$RemainingArguments
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+
+# ---------------------------------------------------------------------------
+# Aide
+# ---------------------------------------------------------------------------
+# /? et ? sont pris par PowerShell pour la valeur positionnelle $Version : on les
+# cherche donc aussi bien dans $Version que dans les arguments restants.
+$jetonsAide = @('/?', '/h', '?', 'help', '--help', '-help', '-h')
+$aideDemandee = $Help -or
+    ($Version -and ($Version.ToLower() -in $jetonsAide)) -or
+    (@($RemainingArguments) | Where-Object { $_ -and ($_.ToLower() -in $jetonsAide) })
+
+if ($aideDemandee) {
+    @'
+Package-Release.ps1
+Fabrique le zip d'une release de claude-easy-setup a partir du dernier commit.
+
+USAGE
+    .\Package-Release.ps1 <version> [-OutDir <dossier>]
+    powershell -ExecutionPolicy Bypass -File .\Package-Release.ps1 -Version <version>
+
+ARGUMENTS
+    <version>, -Version   Numero semver : MAJEUR.MINEUR.CORRECTIF
+                          (ex. 1.0.0, v1.2.3, 2.0.0-rc.1). Obligatoire.
+    -OutDir <dossier>     Dossier de sortie. Par defaut : dist\ a la racine du depot.
+    --help, -h, -Help, /? Affiche cette aide et quitte.
+
+EXEMPLES
+    .\Package-Release.ps1 1.0.0
+        Cree dist\claude-easy-setup-1.0.0.zip
+
+    .\Package-Release.ps1 1.1.0 -OutDir C:\Temp\releases
+        Cree le zip dans un autre dossier.
+
+CE QUI EST PACKAGE
+    Le contenu du dernier COMMIT (pas le dossier de travail), sans
+    .gitattributes, .gitignore, .claude, CLAUDE.md et ce script.
+    Des modifications non commitees sont signalees mais ne sont pas incluses.
+
+APRES LE PACKAGING
+    Pousser le commit, puis publier :
+        gh release create v<version> dist\claude-easy-setup-<version>.zip --title "v<version>" --generate-notes
+'@
+    exit 0
+}
+
 
 # Ce qui ne part PAS dans la release (chemins relatifs a la racine du depot).
 $Exclusions = @(
@@ -71,6 +125,9 @@ function Stop-Script {
 # ---------------------------------------------------------------------------
 # 1. La version
 # ---------------------------------------------------------------------------
+if (-not $Version) {
+    Stop-Script "Version manquante. Exemple : .\Package-Release.ps1 1.0.0   (aide : -Help)"
+}
 $Version = $Version.Trim() -replace '^v', ''
 if ($Version -notmatch $SemVer) {
     Stop-Script "'$Version' n'est pas un numero semver valide (attendu : MAJEUR.MINEUR.CORRECTIF, ex. 1.0.0)."

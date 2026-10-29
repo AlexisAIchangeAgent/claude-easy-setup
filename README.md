@@ -12,6 +12,7 @@ Ce dépôt contient deux kits (un par système), un guide pour demander l'instal
 - [Demande à l'administrateur](#demande-à-ladministrateur)
 - [Installation manuelle pas à pas (Windows)](#installation-manuelle-pas-à-pas-windows)
 - [Ce que les scripts ne peuvent pas faire](#ce-que-les-scripts-ne-peuvent-pas-faire)
+- [Publier une release (mainteneurs)](#publier-une-release-mainteneurs)
 
 ## Quel kit choisir ?
 
@@ -199,3 +200,26 @@ Deux réglages échouent **en silence** et ne sont pas lisibles depuis un script
 2. **Le réglage Obsidian « Détecter toutes les extensions de fichier »** (*Réglages → Fichiers et liens*). Sans lui, les fichiers HTML produits sont invisibles dans la liste.
 
 Claude Desktop, Chrome, Obsidian et l'extension Chrome s'installent aussi à la main sous Windows, pour des raisons de droits administrateur.
+
+---
+
+## Publier une release (mainteneurs)
+
+Les versions suivent [semver](https://semver.org/lang/fr/) (`MAJEUR.MINEUR.CORRECTIF`). La première est `1.0.0`.
+
+Le script `Package-Release.ps1`, à la racine du dépôt, fabrique le zip de la release à partir du **dernier commit**. Il n'est pas inclus dans le zip, pas plus que `.gitattributes`, `.gitignore`, `.claude` et `CLAUDE.md`.
+
+1. **Commiter** les changements : seul ce qui est commité est packagé.
+2. **Lancer le script**, depuis PowerShell, à la racine du dépôt :
+   ```powershell
+   .\Package-Release.ps1 1.0.0
+   ```
+   Si l'exécution de scripts est bloquée :
+   ```powershell
+   powershell -ExecutionPolicy Bypass -File .\Package-Release.ps1 -Version 1.0.0
+   ```
+   Le zip est écrit dans `dist/claude-easy-setup-1.0.0.zip` (option `-OutDir` pour changer de dossier). `.\Package-Release.ps1 -Help` affiche l'aide du script.
+3. **Pousser le commit**, puis publier la release sur GitHub avec la commande affichée par le script :
+   ```bash
+   gh release create v1.0.0 dist/claude-easy-setup-1.0.0.zip --title "v1.0.0" --generate-notes
+   ```
