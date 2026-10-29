@@ -7,3 +7,6 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 *.swp
+
+# Releases fabriquees par Package-Release.ps1
+dist/
