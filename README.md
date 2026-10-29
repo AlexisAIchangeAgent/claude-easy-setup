@@ -207,10 +207,10 @@ Claude Desktop, Chrome, Obsidian et l'extension Chrome s'installent aussi à la 
 
 Les versions suivent [semver](https://semver.org/lang/fr/) (`MAJEUR.MINEUR.CORRECTIF`). La première est `1.0.0`.
 
-Le script `Package-Release.ps1`, à la racine du dépôt, fabrique le zip de la release à partir du **dernier commit**. Il n'est pas inclus dans le zip, pas plus que `.gitattributes`, `.gitignore`, `.claude` et `CLAUDE.md`.
+Le script `Package-Release.ps1`, à la racine du dépôt, fabrique le zip de la release à partir du **dernier commit**, puis la publie sur GitHub avec [`gh`](https://cli.github.com/) si on le demande. Il n'est pas inclus dans le zip, pas plus que `.gitattributes`, `.gitignore`, `.claude` et `CLAUDE.md`.
 
-1. **Commiter** les changements : seul ce qui est commité est packagé.
-2. **Lancer le script**, depuis PowerShell, à la racine du dépôt :
+1. **Commiter et pousser** les changements : seul ce qui est commité est packagé, et la publication exige que le commit soit déjà sur GitHub.
+2. **Fabriquer le zip**, depuis PowerShell, à la racine du dépôt :
    ```powershell
    .\Package-Release.ps1 1.0.0
    ```
@@ -218,8 +218,13 @@ Le script `Package-Release.ps1`, à la racine du dépôt, fabrique le zip de la 
    ```powershell
    powershell -ExecutionPolicy Bypass -File .\Package-Release.ps1 -Version 1.0.0
    ```
-   Le zip est écrit dans `dist/claude-easy-setup-1.0.0.zip` (option `-OutDir` pour changer de dossier). `.\Package-Release.ps1 -Help` affiche l'aide du script.
-3. **Pousser le commit**, puis publier la release sur GitHub avec la commande affichée par le script :
-   ```bash
-   gh release create v1.0.0 dist/claude-easy-setup-1.0.0.zip --title "v1.0.0" --generate-notes
+   Le zip est écrit dans `dist/claude-easy-setup-1.0.0.zip` (option `-OutDir` pour changer de dossier). Rien n'est publié à ce stade.
+3. **Publier la release** en ajoutant `-Publish` :
+   ```powershell
+   .\Package-Release.ps1 1.0.0 -Publish
    ```
+   Le script crée le tag `v1.0.0` sur le commit courant, joint le zip et génère les notes de release. Une version avec suffixe (`2.0.0-rc.1`) est publiée comme pré-release. Avec `-Publish -DryRun`, il fait toutes les vérifications et affiche la commande `gh` sans rien publier.
+
+   Avant de fabriquer le zip, il vérifie que `gh` est installé et connecté (`gh auth login`), que l'arbre de travail est propre, que le commit est poussé et que la version n'existe pas déjà : une version publiée ne se réécrit pas.
+
+`.\Package-Release.ps1 -Help` affiche l'aide complète du script.
