@@ -80,7 +80,7 @@ powershell -ExecutionPolicy Bypass -File .\Setup-ClaudeWorkstation.ps1 [options]
 
 ### Ce que contrôle le diagnostic
 
-`Diagnostic-poste.ps1` vérifie le système (build Windows, RAM d'au moins 8 Go, 10 Go de disque libre), Claude Desktop et la forme sous laquelle il est installé, puis les outils dont le kit se sert (Node.js, Git, etc.). Il produit trois choses :
+`Diagnostic-poste.ps1` vérifie le système (build Windows, RAM d'au moins 7,5 Go (un poste « 8 Go » en affiche un peu moins), 10 Go de disque libre), Claude Desktop et la forme sous laquelle il est installé, puis les outils dont le kit se sert (Node.js, Git, etc.). Il produit trois choses :
 
 1. un tableau lisible à l'écran ;
 2. une **ligne de résultat** à renvoyer, avec le verdict **VERT** (le poste est prêt), **ORANGE** (utilisable, des points restent à traiter) ou **ROUGE** (le poste n'est pas prêt) ;

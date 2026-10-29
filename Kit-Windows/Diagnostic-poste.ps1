@@ -49,7 +49,7 @@ $ErrorActionPreference = 'Stop'
 if (-not (Test-Path Variable:\LASTEXITCODE)) { $global:LASTEXITCODE = 0 }
 
 $script:SEUIL_BUILD_WIN10 = 19041   # Windows 10 version 2004 - exigence Cowork
-$script:SEUIL_RAM_GO      = 8
+$script:SEUIL_RAM_GO      = 7.5     # un "8 Go" annonce affiche 7.4 a 7.9 Go : memoire reservee au materiel
 $script:SEUIL_DISQUE_GO   = 10
 $script:NODE_MAJEUR_CIBLE = 24      # Node 24 LTS - voir le guide
 $script:NODE_MAJEUR_MIN   = 20

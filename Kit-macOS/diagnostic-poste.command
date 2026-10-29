@@ -20,7 +20,8 @@ emulate -R zsh
 set -u
 
 SEUIL_MACOS_MAJEUR=14      # macOS 14 Sonoma - exigence Cowork
-SEUIL_RAM_GO=8
+SEUIL_RAM_DIXIEMES=75      # 7.5 Go, en dixiemes de Go : l'arithmetique du shell est entiere.
+                           # Un "8 Go" annonce affiche 7.4 a 7.9 Go (memoire reservee au materiel).
 SEUIL_DISQUE_GO=10
 NODE_MAJEUR_CIBLE=24
 NODE_MAJEUR_MIN=20
@@ -45,6 +46,13 @@ ajouter() {
 
 titre() { printf '\n%s=== %s%s\n' "$C_TITRE" "$1" "$C_OFF"; }
 ligne() { printf '    %s%s%s\n' "$C_GRIS" "$1" "$C_OFF"; }
+
+go_depuis_dixiemes() {
+  # go_depuis_dixiemes <dixiemes> -> "7.5", "16" (pas de ".0", comme sous Windows)
+  local d="$1" entier=0 reste=0
+  entier=$(( d / 10 )); reste=$(( d % 10 ))
+  if [ "$reste" -eq 0 ]; then printf '%s' "$entier"; else printf '%s.%s' "$entier" "$reste"; fi
+}
 
 # Les outils de developpement Apple sont-ils installes ?
 #
@@ -118,12 +126,14 @@ fi
 # --- Memoire ---------------------------------------------------------------
 RAM_OCTETS="$(sysctl -n hw.memsize 2>/dev/null || echo 0)"
 if [ "$RAM_OCTETS" -gt 0 ] 2>/dev/null; then
-  RAM_GO=$(( RAM_OCTETS / 1073741824 ))
-  if [ "$RAM_GO" -ge "$SEUIL_RAM_GO" ]; then
+  # En dixiemes de Go, arrondi au plus proche (comme [math]::Round(x, 1) cote Windows).
+  RAM_DIXIEMES=$(( (RAM_OCTETS * 10 + 536870912) / 1073741824 ))
+  RAM_GO="$(go_depuis_dixiemes "$RAM_DIXIEMES")"
+  if [ "$RAM_DIXIEMES" -ge "$SEUIL_RAM_DIXIEMES" ]; then
     ajouter "RAM" "Memoire vive" "OK" "${RAM_GO} Go" ""
   else
     ajouter "RAM" "Memoire vive" "BLOQUANT" "${RAM_GO} Go" \
-      "${SEUIL_RAM_GO} Go minimum. Ce poste ne pourra pas faire tourner l'espace de travail : prevoir un binome."
+      "$(go_depuis_dixiemes "$SEUIL_RAM_DIXIEMES") Go minimum. Ce poste ne pourra pas faire tourner l'espace de travail : prevoir un binome."
   fi
   ligne "Memoire : ${RAM_GO} Go"
 else

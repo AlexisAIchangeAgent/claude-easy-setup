@@ -6,7 +6,7 @@
 .DESCRIPTION
     Package le contenu du depot (commit HEAD) dans dist\claude-easy-setup-<version>.zip,
     sans les fichiers propres au depot : .gitattributes, .gitignore, .claude, CLAUDE.md,
-    ainsi que ce script lui-meme.
+    le dossier tests\, ainsi que ce script lui-meme.
 
     Le zip est construit avec "git archive" plutot qu'avec Compress-Archive :
       - les fichiers .command gardent leur bit executable (sinon, sur Mac,
@@ -121,7 +121,7 @@ EXEMPLES
 
 CE QUI EST PACKAGE
     Le contenu du dernier COMMIT (pas le dossier de travail), sans
-    .gitattributes, .gitignore, .claude, CLAUDE.md et ce script.
+    .gitattributes, .gitignore, .claude, CLAUDE.md, tests\ et ce script.
     Des modifications non commitees sont signalees mais ne sont pas incluses.
 
 CE QUE -Publish EXIGE (verifie avant de fabriquer le zip)
@@ -142,6 +142,7 @@ $Exclusions = @(
     '.claude'
     'CLAUDE.md'
     'Package-Release.ps1'
+    'tests'
 )
 
 $NomProjet = 'claude-easy-setup'
