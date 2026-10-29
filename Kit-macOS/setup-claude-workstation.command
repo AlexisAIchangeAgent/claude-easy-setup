@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 # ===========================================================================
 #  Preparer un Mac pour la journee Agile en Seine du 22/09/2026
 #
@@ -13,9 +13,14 @@
 #  Double-cliquez sur ce fichier. Si macOS refuse de l'ouvrir, voir le guide,
 #  section "Premier lancement sur Mac".
 #
-#  Ecrit pour bash 3.2, la version livree avec macOS.
+#  Ecrit pour zsh, le shell livre avec macOS (/bin/zsh). Les tableaux y sont
+#  indexes a partir de 1. Seul l'installeur de Homebrew est lance avec bash
+#  (/bin/bash) : c'est un script bash, pas un script zsh.
 # ===========================================================================
 
+# Repart des reglages par defaut de zsh : ~/.zshenv est lu meme pour un script
+# et pourrait activer des options qui changent le comportement ci-dessous.
+emulate -R zsh
 set -u
 
 NODE_FORMULE="node@24"        # Node 24 est la ligne LTS active au 22/09/2026
@@ -23,13 +28,8 @@ SEUIL_MACOS_COWORK=14         # macOS 14 Sonoma - exigence de l'espace de travai
 
 SANS_BREW=0
 SANS_CLAUDE=0
-# Garde volontaire : avec `set -u`, le bash 3.2 de macOS traite "$@" comme une
-# variable non definie quand le script est lance sans argument - ce qui est le
-# cas du double-clic, donc du cas nominal.
-[ "$#" -eq 0 ] && set -- --aucun-argument
 for arg in "$@"; do
   case "$arg" in
-    --aucun-argument) : ;;
     --sans-brew)   SANS_BREW=1 ;;
     --sans-claude) SANS_CLAUDE=1 ;;
     -h|--help|help)
@@ -78,7 +78,7 @@ xcode-select -p >/dev/null 2>&1 && CLT_PRESENTS=1
 
 commande_sondable() {
   # commande_sondable <nom> -> 0 si on peut l'executer sans ouvrir de fenetre
-  local chemin
+  local chemin=""
   chemin="$(command -v "$1" 2>/dev/null)" || return 1
   [ -n "$chemin" ] || return 1
   case "$chemin" in
@@ -300,7 +300,7 @@ else
     # Etape de liaison, sans laquelle rien ne trouve node.
     info "brew link --overwrite --force $NODE_FORMULE  (formule keg-only)"
     brew link --overwrite --force "$NODE_FORMULE" >/dev/null 2>&1 || true
-    hash -r 2>/dev/null || true
+    rehash
 
     # On revalide la MAJEURE, pas la seule presence : un Node plus ancien place
     # avant Homebrew dans le PATH ferait afficher "OK v20" apres avoir installe la 24.
@@ -374,7 +374,7 @@ if [ "$PY_OK" -eq 0 ]; then
       # introuvable apres reouverture du Terminal et le diagnostic dira BLOQUANT.
       info "brew link --overwrite --force python@3.13  (formule potentiellement keg-only)"
       brew link --overwrite --force python@3.13 >/dev/null 2>&1 || true
-      hash -r 2>/dev/null || true
+      rehash
       if command -v python3.13 >/dev/null 2>&1; then
         ok "$(python3.13 --version)"
         resultat "Python" "OK" "$(python3.13 --version)"
@@ -439,8 +439,8 @@ printf '  %-20s %-18s %s\n' "--------------------" "------------------" "------"
 NB=${#ETAPES[@]}
 ECHECS=0
 MANUELLES=0
-i=0
-while [ "$i" -lt "$NB" ]; do
+i=1
+while [ "$i" -le "$NB" ]; do
   case "${RESULTATS[$i]}" in
     OK)     couleur="$C_OK" ;;
     ECHEC)  couleur="$C_KO"; ECHECS=$(( ECHECS + 1 )) ;;

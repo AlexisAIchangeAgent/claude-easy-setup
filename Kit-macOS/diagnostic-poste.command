@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/zsh
 # ===========================================================================
 #  Diagnostic du poste - journee Agile en Seine du 22/09/2026  (macOS)
 #
@@ -9,10 +9,14 @@
 #  Double-cliquez sur ce fichier. Si macOS refuse de l'ouvrir, voir le guide,
 #  section "Premier lancement sur Mac".
 #
-#  Ecrit pour bash 3.2, la version livree avec macOS : pas de tableaux
-#  associatifs, pas de mapfile, pas de ${var,,}. Ne pas "moderniser".
+#  Ecrit pour zsh, le shell livre avec macOS (/bin/zsh). Differences avec bash
+#  qui comptent ici : les tableaux sont indexes a partir de 1, et un motif de
+#  fichier sans correspondance est une erreur (voir le qualificatif (N)).
 # ===========================================================================
 
+# Repart des reglages par defaut de zsh : ~/.zshenv est lu meme pour un script
+# et pourrait activer des options qui changent le comportement ci-dessous.
+emulate -R zsh
 set -u
 
 SEUIL_MACOS_MAJEUR=14      # macOS 14 Sonoma - exigence Cowork
@@ -31,7 +35,7 @@ else
   C_TITRE=""; C_OK=""; C_WARN=""; C_KO=""; C_GRIS=""; C_OFF=""
 fi
 
-# Tableaux paralleles - bash 3.2 n'a pas d'associatif.
+# Tableaux paralleles, indexes de 1 a $NB (convention zsh).
 CLES=(); LIBELLES=(); STATUTS=(); DETAILS=(); QUEFAIRE=()
 
 ajouter() {
@@ -63,7 +67,7 @@ est_amorce_clt() {
 # Sonde une commande : elle doit exister ET repondre, sans ouvrir de fenetre.
 version_outil() {
   # version_outil <commande> [argument]
-  local cmd="$1"; local arg="${2:---version}"; local chemin out
+  local cmd="$1" arg="${2:---version}" chemin="" out=""
   chemin="$(command -v "$cmd" 2>/dev/null)" || return 1
   [ -n "$chemin" ] || return 1
   est_amorce_clt "$chemin" && return 1
@@ -292,7 +296,9 @@ EXT_TROUVEE=0
 PROFILS_LUS=0
 CHROME_DATA="$HOME/Library/Application Support/Google/Chrome"
 if [ -d "$CHROME_DATA" ]; then
-  for profil in "$CHROME_DATA"/Default "$CHROME_DATA"/Profile*; do
+  # (N) : sans profil "Profile N" (un seul profil Chrome), zsh echouerait avec
+  # "no matches found" au lieu de passer son chemin.
+  for profil in "$CHROME_DATA"/Default "$CHROME_DATA"/Profile*(N); do
     [ -d "$profil" ] || continue
     PROFILS_LUS=$(( PROFILS_LUS + 1 ))
     [ -d "$profil/Extensions" ] || continue
@@ -336,8 +342,8 @@ printf '  %-34s %-9s %s\n' "Controle" "Statut" "Detail"
 printf '  %-34s %-9s %s\n' "----------------------------------" "---------" "------"
 
 NB=${#CLES[@]}
-i=0
-while [ "$i" -lt "$NB" ]; do
+i=1
+while [ "$i" -le "$NB" ]; do
   detail="${DETAILS[$i]}"
   if [ ${#detail} -gt 58 ]; then detail="$(printf '%.55s' "$detail")..."; fi
   case "${STATUTS[$i]}" in
@@ -352,8 +358,8 @@ while [ "$i" -lt "$NB" ]; do
 done
 
 NB_BLOQUANTS=0; NB_ALERTES=0; NB_INCONNUS=0
-i=0
-while [ "$i" -lt "$NB" ]; do
+i=1
+while [ "$i" -le "$NB" ]; do
   case "${STATUTS[$i]}" in
     BLOQUANT) NB_BLOQUANTS=$(( NB_BLOQUANTS + 1 )) ;;
     ALERTE)   NB_ALERTES=$(( NB_ALERTES + 1 )) ;;
@@ -378,8 +384,8 @@ if [ "$NB_BLOQUANTS" -gt 0 ] || [ "$NB_ALERTES" -gt 0 ]; then
   titre "Ce qu il reste a faire"
   rang=0
   for cible in BLOQUANT ALERTE; do
-    i=0
-    while [ "$i" -lt "$NB" ]; do
+    i=1
+    while [ "$i" -le "$NB" ]; do
       if [ "${STATUTS[$i]}" = "$cible" ] && [ -n "${QUEFAIRE[$i]}" ]; then
         rang=$(( rang + 1 ))
         if [ "$cible" = "BLOQUANT" ]; then
@@ -442,8 +448,8 @@ printf '     %sSans lui, les fichiers HTML que vous produirez seront invisibles 
 # 6. La ligne de resultat
 # ===========================================================================
 CODES=""
-i=0
-while [ "$i" -lt "$NB" ]; do
+i=1
+while [ "$i" -le "$NB" ]; do
   case "${STATUTS[$i]}" in
     OK)       abrege="OK" ;;
     INFO)     abrege="--" ;;
@@ -472,8 +478,8 @@ RAPPORT="$DOSSIER/Diagnostic-${USER:-poste}-$(date '+%Y%m%d-%H%M').txt"
   printf '%s\n\n' "Genere le $HORODATAGE sur $(hostname 2>/dev/null || echo '?') par ${USER:-?}"
   printf '%s\n\n' "$LIGNE"
   printf '%s\n' "Detail complet :"
-  i=0
-  while [ "$i" -lt "$NB" ]; do
+  i=1
+  while [ "$i" -le "$NB" ]; do
     printf '  [%s] %s - %s\n' "${STATUTS[$i]}" "${LIBELLES[$i]}" "${DETAILS[$i]}"
     if [ -n "${QUEFAIRE[$i]}" ]; then printf '      -> %s\n' "${QUEFAIRE[$i]}"; fi
     i=$(( i + 1 ))
